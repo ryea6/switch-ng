@@ -1,0 +1,62 @@
+import { Component, type OnInit, type OnDestroy } from "@angular/core"
+import type { MatDialog } from "@angular/material/dialog"
+import type { Observable } from "rxjs"
+import type { PageUserContextService, User } from "../../services/page-user-context.service"
+import { UserSwitchModalComponent, type SwitchModalData } from "../user-switch-modal/user-switch-modal.component"
+
+@Component({
+  selector: "app-work-queue",
+  templateUrl: "./work-queue.component.html",
+  styleUrls: ["./work-queue.component.scss"],
+})
+export class WorkQueueComponent implements OnInit, OnDestroy {
+  private pageId = "work-queue"
+  effectiveUser$: Observable<User | null>
+  currentUser: User = { id: "current", name: "Current User", email: "current@example.com" }
+
+  constructor(
+    private pageContext: PageUserContextService,
+    private dialog: MatDialog,
+  ) {
+    this.effectiveUser$ = this.pageContext.getPageContext$(this.pageId)
+  }
+
+  ngOnInit(): void {
+    // Initialize work queue data
+  }
+
+  ngOnDestroy(): void {
+    // Clean up if needed
+  }
+
+  switchWorkQueue(): void {
+    this.openSwitchModal("work-queue")
+  }
+
+  switchCaseManagement(): void {
+    this.openSwitchModal("case-management")
+  }
+
+  private openSwitchModal(switchType: "work-queue" | "case-management"): void {
+    const dialogRef = this.dialog.open(UserSwitchModalComponent, {
+      width: "500px",
+      data: {
+        switchType,
+        currentPageId: this.pageId,
+      } as SwitchModalData,
+    })
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result?.switched && result?.openNewTab) {
+        // Open new case management tab with selected user
+        this.openCaseManagementTab(result.user)
+      }
+    })
+  }
+
+  private openCaseManagementTab(user: User): void {
+    // Open new tab/window for case management with user context
+    const url = `/case-management?user=${user.id}`
+    window.open(url, "_blank")
+  }
+}
