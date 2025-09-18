@@ -1,0 +1,23 @@
+<div class="case-management-container">
+  <div class="header">
+    <h1>Case Management</h1>
+    <div class="user-info" *ngIf="effectiveUser$ | async as effectiveUser; else currentUserTemplate">
+      <span class="switched-user">Managing cases for: {{ effectiveUser.name }}</span>
+    </div>
+    <ng-template #currentUserTemplate>
+      <div class="user-info">
+        <span class="current-user">Managing your cases</span>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="case-management-content">
+    <!-- Your case management data table goes here -->
+    <p *ngIf="effectiveUser$ | async as effectiveUser; else myDataTemplate">
+      Showing case management data for: {{ effectiveUser.name }}
+    </p>
+    <ng-template #myDataTemplate>
+      <p>Showing your case management data</p>
+    </ng-template>
+  </div>
+</div>
