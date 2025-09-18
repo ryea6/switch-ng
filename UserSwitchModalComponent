@@ -1,0 +1,77 @@
+import { Component, type OnInit } from "@angular/core"
+import type { MatDialogRef } from "@angular/material/dialog"
+import type { PageUserContextService, User } from "../../services/page-user-context.service"
+
+export interface SwitchModalData {
+  switchType: "work-queue" | "case-management"
+  currentPageId: string
+}
+
+@Component({
+  selector: "app-user-switch-modal",
+  templateUrl: "./user-switch-modal.component.html",
+  styleUrls: ["./user-switch-modal.component.scss"],
+})
+export class UserSwitchModalComponent implements OnInit {
+  users: User[] = []
+  selectedUser: User | null = null
+  data: SwitchModalData
+  dialogRef: MatDialogRef<UserSwitchModalComponent>
+  pageContext: PageUserContextService
+
+  constructor(
+    data: SwitchModalData,
+    dialogRef: MatDialogRef<UserSwitchModalComponent>,
+    pageContext: PageUserContextService,
+  ) {
+    this.data = data
+    this.dialogRef = dialogRef
+    this.pageContext = pageContext
+  }
+
+  ngOnInit(): void {
+    // Load available users - replace with your actual user service
+    this.loadUsers()
+  }
+
+  onUserSelected(user: User): void {
+    this.selectedUser = user
+  }
+
+  onSwitchConfirmed(): void {
+    if (!this.selectedUser) return
+
+    if (this.data.switchType === "work-queue") {
+      // Switch work queue context
+      this.pageContext.switchPageUser("work-queue", this.selectedUser)
+      this.dialogRef.close({ switched: true, user: this.selectedUser })
+    } else {
+      // For case management, return user data to open new tab
+      this.dialogRef.close({
+        switched: true,
+        user: this.selectedUser,
+        openNewTab: true,
+      })
+    }
+  }
+
+  onSwitchBackToMe(): void {
+    if (this.data.switchType === "work-queue") {
+      this.pageContext.switchPageUser("work-queue", null)
+    }
+    this.dialogRef.close({ switched: true, user: null })
+  }
+
+  onCancel(): void {
+    this.dialogRef.close({ switched: false })
+  }
+
+  private loadUsers(): void {
+    // Replace with your actual user service call
+    this.users = [
+      { id: "abe123", name: "Abe Lincoln", email: "abe@example.com" },
+      { id: "joe456", name: "Joe Smith", email: "joe@example.com" },
+      { id: "mary789", name: "Mary Johnson", email: "mary@example.com" },
+    ]
+  }
+}
