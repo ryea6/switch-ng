@@ -1,0 +1,32 @@
+<div class="work-queue-container">
+  <div class="header">
+    <h1>Work Queue</h1>
+    <div class="user-info" *ngIf="effectiveUser$ | async as effectiveUser; else currentUserTemplate">
+      <span class="switched-user">Viewing as: {{ effectiveUser.name }}</span>
+    </div>
+    <ng-template #currentUserTemplate>
+      <div class="user-info">
+        <span class="current-user">{{ currentUser.name }}</span>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="switchWorkQueue()">
+      Switch Work Queue
+    </button>
+    <button mat-raised-button color="accent" (click)="switchCaseManagement()">
+      Switch Case Management
+    </button>
+  </div>
+
+  <div class="work-queue-content">
+    <!-- Your work queue data table goes here -->
+    <p *ngIf="effectiveUser$ | async as effectiveUser; else myDataTemplate">
+      Showing work queue data for: {{ effectiveUser.name }}
+    </p>
+    <ng-template #myDataTemplate>
+      <p>Showing your work queue data</p>
+    </ng-template>
+  </div>
+</div>
