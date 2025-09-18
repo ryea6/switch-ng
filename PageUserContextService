@@ -1,0 +1,64 @@
+import { Injectable } from "@angular/core"
+import { BehaviorSubject, type Observable } from "rxjs"
+
+export interface User {
+  id: string
+  name: string
+  email: string
+}
+
+@Injectable({
+  providedIn: "root",
+})
+export class PageUserContextService {
+  private contexts = new Map<string, BehaviorSubject<User | null>>()
+
+  // Get or create context for a specific page instance
+  getPageContext$(pageId: string): Observable<User | null> {
+    if (!this.contexts.has(pageId)) {
+      this.contexts.set(pageId, new BehaviorSubject<User | null>(null))
+      this.loadPersistedContext(pageId)
+    }
+    return this.contexts.get(pageId)!.asObservable()
+  }
+
+  // Switch user for specific page
+  switchPageUser(pageId: string, user: User | null): void {
+    if (!this.contexts.has(pageId)) {
+      this.contexts.set(pageId, new BehaviorSubject<User | null>(null))
+    }
+    this.contexts.get(pageId)!.next(user)
+    this.persistContext(pageId, user)
+  }
+
+  // Get current user for a page (synchronous)
+  getCurrentPageUser(pageId: string): User | null {
+    return this.contexts.get(pageId)?.value || null
+  }
+
+  // Clean up when page/tab closes
+  cleanupPageContext(pageId: string): void {
+    this.contexts.delete(pageId)
+    localStorage.removeItem(`page_context_${pageId}`)
+  }
+
+  private loadPersistedContext(pageId: string): void {
+    const stored = localStorage.getItem(`page_context_${pageId}`)
+    if (stored) {
+      try {
+        const user = JSON.parse(stored)
+        this.contexts.get(pageId)?.next(user)
+      } catch (error) {
+        console.error("Failed to parse stored user context:", error)
+      }
+    }
+  }
+
+  private persistContext(pageId: string, user: User | null): void {
+    if (user) {
+      localStorage.setItem(`page_context_${pageId}`, JSON.stringify(user))
+    } else {
+      localStorage.removeItem(`page_context_${pageId}`)
+    }
+  }
+}
