@@ -1,0 +1,24 @@
+Work Queue Flow
+
+1. User clicks "Switch Work Queue" button
+2. UserSwitchModalComponent opens with switchType: 'work-queue'
+3. Modal checks: pageContext.getPageContext$('work-queue') 
+   → Gets switched user name OR null
+4. Modal determines effective user:
+   → switchedUserName || currentUser.name
+5. Modal makes API call: apiService.getTableData(effectiveUserName)
+6. Modal updates work queue table data
+7. Work queue shows the effective user's data
+
+Case Management Flow
+
+1. User clicks "Switch Case Management" button  
+2. UserSwitchModalComponent opens with switchType: 'case-management'
+3. Modal generates unique pageId: 'case-mgmt-1234567890'
+4. Modal checks: pageContext.getPageContext$(pageId)
+   → Gets switched user name OR null
+5. Modal determines effective user:
+   → switchedUserName || currentUser.name
+6. Modal makes API call: apiService.getCaseData(effectiveUserName)
+7. Modal opens new tab with case management data
+8. New tab shows the effective user's case data
