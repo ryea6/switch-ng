@@ -1,0 +1,31 @@
+import { Component, type OnInit, type OnDestroy } from "@angular/core"
+import type { ActivatedRoute } from "@angular/router"
+import type { Observable } from "rxjs"
+import type { PageUserContextService, User } from "../../services/page-user-context.service"
+
+@Component({
+  selector: "app-case-management",
+  templateUrl: "./case-management.component.html",
+  styleUrls: ["./case-management.component.scss"],
+})
+export class CaseManagementComponent implements OnInit, OnDestroy {
+  private pageId = `case-mgmt-${Date.now()}-${Math.random()}`
+  effectiveUser$: Observable<User | null>
+  currentUser: User = { id: "current", name: "Current User", email: "current@example.com" }
+
+  constructor(
+    private pageContext: PageUserContextService,
+    private route: ActivatedRoute,
+  ) {
+    this.effectiveUser$ = this.pageContext.getPageContext$(this.pageId)
+  }
+
+  ngOnInit(): void {
+    // Component starts with no switched context
+  }
+
+  ngOnDestroy(): void {
+    // Clean up page context when tab closes
+    this.pageContext.cleanupPageContext(this.pageId)
+  }
+}
