@@ -1,0 +1,35 @@
+<div class="user-switch-modal">
+  <h2 mat-dialog-title>
+    {{ data.switchType === 'work-queue' ? 'Switch Work Queue User' : 'Open Case Management for User' }}
+  </h2>
+
+  <mat-dialog-content>
+    <div class="user-list">
+      <mat-radio-group [(ngModel)]="selectedUser">
+        <mat-radio-button 
+          *ngFor="let user of users" 
+          [value]="user"
+          class="user-option">
+          <div class="user-info">
+            <span class="user-name">{{ user.name }}</span>
+            <span class="user-email">{{ user.email }}</span>
+          </div>
+        </mat-radio-button>
+      </mat-radio-group>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button mat-button color="warn" (click)="onSwitchBackToMe()">
+      Switch Back to Me
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      [disabled]="!selectedUser"
+      (click)="onSwitchConfirmed()">
+      {{ data.switchType === 'work-queue' ? 'Switch' : 'Open Tab' }}
+    </button>
+  </mat-dialog-actions>
+</div>
